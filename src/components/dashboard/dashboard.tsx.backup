@@ -1,0 +1,355 @@
+"use client"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useEffect, useMemo, useState } from "react"
+import http from "@/lib/http"
+import { StatsData, SourceStatsResponse, CategoryCountsResponse, ProductSymptomTopResponse, ProductSymptomTopItem } from "@/types"
+import { mapStatsToTrend } from "@/lib/data-mappers"
+import { useProductStore } from "@/store/useProductStore"
+import { Skeleton } from "@/components/ui/skeleton"
+import { WordCloudResponse } from "@/types"
+import { WordCloud } from "@/components/ui/word-cloud"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart"
+import {
+  CartesianGrid,
+  Line,
+  LineChart as ReLineChart,
+  XAxis,
+  YAxis,
+  BarChart as ReBarChart,
+  Bar,
+} from "recharts"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
+import { zhCN } from "date-fns/locale"
+import { cn } from "@/lib/utils"
+
+const fallbackSources = { items: [
+  { name: "新闻", count: 156 },
+  { name: "文献", count: 89 },
+  { name: "召回", count: 34 },
+  { name: "毒性数据库", count: 50 },
+  { name: "医疗信息", count: 0 },
+] } as SourceStatsResponse
+
+
+export default function DashboardPage() {
+  const { product: selectedProduct, setFeatureName, keywords } = useProductStore()
+  const [stats, setStats] = useState<any[]>([])
+  const [loadingStats, setLoadingStats] = useState(false)
+  const [sources, setSources] = useState<SourceStatsResponse | null>(null)
+  const [catCounts, setCatCounts] = useState<CategoryCountsResponse | null>(null)
+  const [topPairs, setTopPairs] = useState<ProductSymptomTopItem[]>([])
+  const [loadingTopPairs, setLoadingTopPairs] = useState(false)
+  
+  // 日期选择状态 - 默认最近3天
+  const [dateFrom, setDateFrom] = useState<Date>(() => {
+    const date = new Date()
+    date.setDate(date.getDate() - 3)
+    return date
+  })
+  const [dateTo, setDateTo] = useState<Date>(new Date())
+
+  // 加载采集趋势数据
+  useEffect(() => {
+    setLoadingStats(true)
+    
+    const fromStr = format(dateFrom, 'yyyy-MM-dd')
+    const toStr = format(dateTo, 'yyyy-MM-dd')
+    
+    console.log(`Fetching trend data from ${fromStr} to ${toStr}...`)
+    
+    http
+      .get<any, any>("/dashboard/trend/daily", { 
+        params: { from: fromStr, to: toStr } 
+      })
+      .then((data) => {
+        console.log("Trend data received:", data)
+        setStats(data || [])
+      })
+      .catch((error) => {
+        console.error("Error fetching trend data:", error)
+        setStats([])
+      })
+      .finally(() => setLoadingStats(false))
+  }, [dateFrom, dateTo])
+
+  useEffect(() => {
+    http
+      .get<any, SourceStatsResponse>("/dashboard/sources", { params: { product: selectedProduct, keywords: (keywords || []).join(',') } })
+      .then((data) => {
+        console.log("Source stats data received:", data)
+        setSources(data)
+      })
+      .catch((error) => {
+        console.error("Error fetching source stats:", error)
+        setSources(fallbackSources)
+      })
+  }, [selectedProduct, keywords])
+
+  // 与产品无关：加载六大类别总量（页面挂载时加载一次）
+  useEffect(() => {
+    http
+      .get<any, CategoryCountsResponse>("/collection/category-counts")
+      .then((data) => setCatCounts(data))
+      .catch(() => setCatCounts({ items: [] }))
+  }, [])
+
+  // 加载产品-症状热搜榜 Top5（半年内）
+  useEffect(() => {
+    setLoadingTopPairs(true)
+    
+    http
+      .get<any, ProductSymptomTopResponse>("/dashboard/product-symptom/top")
+      .then((response) => {
+        console.log("Top pairs data received:", response)
+        if (response.code === 200 && response.data) {
+          setTopPairs(response.data.items || [])
+        } else {
+          setTopPairs([])
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching top pairs:", error)
+        setTopPairs([])
+      })
+      .finally(() => setLoadingTopPairs(false))
+  }, [])
+
+  const barData = useMemo(() => {
+    const s = sources || fallbackSources
+    return s.items
+  }, [sources])
+
+  return (
+    <div className="container mx-auto px-4 pt-4 pb-8">
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* 合并的div：六大类别总量和来源渠道统计 */}
+        <Card className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* 六大类别总量 */}
+            <div>
+              <CardHeader>
+                <CardTitle>五大类别总量（产品/过敏原/症状）</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  className="w-full h-72 aspect-auto"
+                  config={{
+                    products: { label: "总产品数", color: "hsl(var(--chart-1, var(--accent)))" },
+                    allergens: { label: "总过敏原数", color: "hsl(var(--chart-2, var(--primary)))" },
+                    symptoms: { label: "总症状数", color: "hsl(var(--chart-3, var(--muted-foreground)))" },
+                  }}
+                >
+                  <ReBarChart data={(catCounts?.items || []).map(i => ({ name: i.name || i.categoryName, products: i.products, allergens: i.allergens, symptoms: i.symptoms }))}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                    <YAxis width={32} tickLine={false} axisLine={false} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Bar dataKey="products" fill="var(--color-products)" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="allergens" fill="var(--color-allergens)" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="symptoms" fill="var(--color-symptoms)" radius={[6, 6, 0, 0]} />
+                  </ReBarChart>
+                </ChartContainer>
+              </CardContent>
+            </div>
+
+            {/* 来源渠道统计 */}
+            <div>
+              <CardHeader>
+                <CardTitle>来源渠道统计</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  className="w-full h-72 aspect-auto"
+                  config={{
+                    count: { label: "数量", color: "hsl(var(--accent))" },
+                  }}
+                >
+                  <ReBarChart data={barData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                    <YAxis width={32} tickLine={false} axisLine={false} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="count" fill="var(--color-count)" radius={[6, 6, 0, 0]} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                  </ReBarChart>
+                </ChartContainer>
+              </CardContent>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle>采集数据趋势（文献/新闻/召回）</CardTitle>
+            <div className="flex items-center gap-2">
+              {/* 起始日期选择 */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[140px] justify-start text-left font-normal",
+                      !dateFrom && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateFrom ? format(dateFrom, "MM-dd", { locale: zhCN }) : "起始日期"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={dateFrom}
+                    onSelect={(date) => date && setDateFrom(date)}
+                    disabled={(date) => date > new Date() || date > dateTo}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              
+              <span className="text-muted-foreground">至</span>
+              
+              {/* 结束日期选择 */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[140px] justify-start text-left font-normal",
+                      !dateTo && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateTo ? format(dateTo, "MM-dd", { locale: zhCN }) : "结束日期"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={dateTo}
+                    onSelect={(date) => date && setDateTo(date)}
+                    disabled={(date) => date > new Date() || date < dateFrom}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {loadingStats ? (
+              <Skeleton className="h-72 w-full" />
+            ) : stats.length === 0 ? (
+              <div className="h-72 w-full flex items-center justify-center text-muted-foreground">
+                暂无数据
+              </div>
+            ) : (
+              <ChartContainer
+                className="w-full h-72 aspect-auto"
+                config={{
+                  文献: { label: "文献", color: "hsl(var(--chart-1, var(--accent)))" },
+                  新闻: { label: "新闻", color: "hsl(var(--chart-2, var(--primary)))" },
+                  召回: { label: "召回", color: "hsl(var(--chart-3, var(--muted-foreground)))" },
+                }}
+              >
+                <ReLineChart data={stats}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                  <YAxis width={32} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Line type="monotone" dataKey="文献" stroke="var(--color-文献)" dot={false} strokeWidth={2} />
+                  <Line type="monotone" dataKey="新闻" stroke="var(--color-新闻)" dot={false} strokeWidth={2} />
+                  <Line type="monotone" dataKey="召回" stroke="var(--color-召回)" dot={false} strokeWidth={2} />
+                </ReLineChart>
+              </ChartContainer>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 产品-不良反应热搜榜 Top5 */}
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <CardTitle>产品-不良反应热搜榜 Top 5</CardTitle>
+              <span className="text-sm text-muted-foreground">近半年（180天）证据支持分数排行</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {loadingTopPairs ? (
+              <Skeleton className="h-64 w-full" />
+            ) : topPairs.length === 0 ? (
+              <div className="h-64 w-full flex items-center justify-center text-muted-foreground">
+                暂无数据
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-16">排名</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">产品名称</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">不良反应</th>
+                      <th className="text-right py-3 px-4 font-medium text-sm text-muted-foreground w-32">证据支持分数</th>
+                      <th className="text-right py-3 px-4 font-medium text-sm text-muted-foreground w-24">证据数</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topPairs.map((item) => (
+                      <tr key={item.id} className="border-b hover:bg-muted/50 transition-colors">
+                        <td className="py-4 px-4">
+                          <div className={cn(
+                            "flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm",
+                            item.rank === 1 && "bg-yellow-100 text-yellow-700",
+                            item.rank === 2 && "bg-gray-100 text-gray-700",
+                            item.rank === 3 && "bg-orange-100 text-orange-700",
+                            item.rank > 3 && "bg-muted text-muted-foreground"
+                          )}>
+                            {item.rank}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 font-medium">{item.product_name}</td>
+                        <td className="py-4 px-4">{item.symptom_name}</td>
+                        <td className="py-4 px-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <div className="flex-1 max-w-[100px] bg-muted rounded-full h-2 overflow-hidden">
+                              <div 
+                                className="bg-primary h-full transition-all"
+                                style={{ width: `${Math.min(item.confidence * 100, 100)}%` }}
+                              />
+                            </div>
+                            <span className="font-semibold text-primary min-w-[3rem]">
+                              {item.confidence}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-right text-muted-foreground">
+                          {item.evidence_count}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+

@@ -1,0 +1,15 @@
+Flask
+Flask-Cors
+Flask-SQLAlchemy
+python-dotenv
+PyMySQL
+SQLAlchemy
+requests
+urllib3
+beautifulsoup4
+neo4j
+openai
+chromadb
+sentence-transformers
+scikit-learn
+jieba

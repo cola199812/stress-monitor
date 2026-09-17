@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmap-content xmlns="urn:xmind:xmap:xmlns:content:2.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink" version="2.0">
+  <sheet id="root" timestamp="1711804920000">
+    <topic id="root-topic" timestamp="1711804920000">
+      <title>信息管理系统 - 后端功能架构</title>
+      
+      <!-- 类别管理 -->
+      <children>
+        <topics type="attached">
+          <topic id="category-management" timestamp="1711804920001">
+            <title>1. 类别管理（新增）</title>
+            <children>
+              <topics type="attached">
+                <topic id="product-category" timestamp="1711804920002">
+                  <title>产品类别管理（二级）</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="pc-1" timestamp="1711804920003">
+                        <title>GET /entity/categories - 获取列表</title>
+                      </topic>
+                      <topic id="pc-2" timestamp="1711804920004">
+                        <title>POST /entity/categories - 新建类别</title>
+                      </topic>
+                      <topic id="pc-3" timestamp="1711804920005">
+                        <title>PUT /entity/categories/{id} - 更新类别</title>
+                      </topic>
+                      <topic id="pc-4" timestamp="1711804920006">
+                        <title>DELETE /entity/categories/{id} - 删除类别</title>
+                        <labels>
+                          <label>检查产品关联</label>
+                        </labels>
+                      </topic>
+                    </topics>
+                  </children>
+                  <labels>
+                    <label>product_2表</label>
+                  </labels>
+                </topic>
+                <topic id="symptom-category" timestamp="1711804920007">
+                  <title>症状类别管理（一级）</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="sc-1" timestamp="1711804920008">
+                        <title>GET /entity/symptoms/level1 - 获取列表</title>
+                      </topic>
+                      <topic id="sc-2" timestamp="1711804920009">
+                        <title>POST /entity/symptoms/level1 - 新建类别</title>
+                      </topic>
+                      <topic id="sc-3" timestamp="1711804920010">
+                        <title>PUT /entity/symptoms/level1/{id} - 更新类别</title>
+                      </topic>
+                      <topic id="sc-4" timestamp="1711804920011">
+                        <title>DELETE /entity/symptoms/level1/{id} - 删除类别</title>
+                        <labels>
+                          <label>检查二级症状关联</label>
+                        </labels>
+                      </topic>
+                    </topics>
+                  </children>
+                  <labels>
+                    <label>symptom_1表</label>
+                  </labels>
+                </topic>
+              </topics>
+            </children>
+          </topic>
+          
+          <!-- 实体管理 -->
+          <topic id="entity-management" timestamp="1711804920012">
+            <title>2. 实体管理</title>
+            <children>
+              <topics type="attached">
+                <topic id="product-mgmt" timestamp="1711804920013">
+                  <title>产品管理</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="pm-1" timestamp="1711804920014">
+                        <title>GET /entity/products/level3</title>
+                        <labels>
+                          <label>统计：不良反应数、化学应激源数</label>
+                        </labels>
+                      </topic>
+                      <topic id="pm-2" timestamp="1711804920015">
+                        <title>POST /entity/products - 新建产品</title>
+                      </topic>
+                      <topic id="pm-3" timestamp="1711804920016">
+                        <title>PUT /entity/products/{id} - 修改名称</title>
+                      </topic>
+                      <topic id="pm-4" timestamp="1711804920017">
+                        <title>DELETE /entity/products/{id} - 删除产品</title>
+                        <labels>
+                          <label>检查关联关系</label>
+                          <label>409错误</label>
+                        </labels>
+                      </topic>
+                    </topics>
+                  </children>
+                  <labels>
+                    <label>三级结构</label>
+                  </labels>
+                </topic>
+                <topic id="allergen-mgmt" timestamp="1711804920018">
+                  <title>化学应激源管理</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="am-1" timestamp="1711804920019">
+                        <title>GET /entity/allergens</title>
+                        <labels>
+                          <label>统计：产品数、症状数</label>
+                        </labels>
+                      </topic>
+                      <topic id="am-2" timestamp="1711804920020">
+                        <title>POST /entity/allergens - 新建</title>
+                      </topic>
+                      <topic id="am-3" timestamp="1711804920021">
+                        <title>PUT /entity/allergens/{id} - 更新</title>
+                      </topic>
+                      <topic id="am-4" timestamp="1711804920022">
+                        <title>DELETE /entity/allergens/{id} - 删除</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+                <topic id="symptom-mgmt" timestamp="1711804920023">
+                  <title>不良反应管理</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="sm-1" timestamp="1711804920024">
+                        <title>GET /entity/symptoms/level3</title>
+                        <labels>
+                          <label>统计：产品数、化学应激源数</label>
+                        </labels>
+                      </topic>
+                      <topic id="sm-2" timestamp="1711804920025">
+                        <title>POST /entity/symptoms - 新建</title>
+                      </topic>
+                      <topic id="sm-3" timestamp="1711804920026">
+                        <title>PUT /entity/symptoms/{id} - 更新</title>
+                      </topic>
+                      <topic id="sm-4" timestamp="1711804920027">
+                        <title>DELETE /entity/symptoms/{id} - 删除</title>
+                      </topic>
+                    </topics>
+                  </children>
+                  <labels>
+                    <label>三级症状</label>
+                  </labels>
+                </topic>
+              </topics>
+            </children>
+          </topic>
+          
+          <!-- 关联关系管理 -->
+          <topic id="relationship-management" timestamp="1711804920028">
+            <title>3. 关联关系管理</title>
+            <children>
+              <topics type="attached">
+                <topic id="product-symptom" timestamp="1711804920029">
+                  <title>产品-不良反应关联</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="ps-1" timestamp="1711804920030">
+                        <title>GET /relationship/product-symptom</title>
+                        <labels>
+                          <label>统计来源数量</label>
+                        </labels>
+                      </topic>
+                      <topic id="ps-2" timestamp="1711804920031">
+                        <title>POST /relationship/product-symptom - 新建</title>
+                      </topic>
+                      <topic id="ps-3" timestamp="1711804920032">
+                        <title>PUT /relationship/product-symptom/{id} - 修改</title>
+                      </topic>
+                      <topic id="ps-4" timestamp="1711804920033">
+                        <title>DELETE /relationship/product-symptom/{id}</title>
+                      </topic>
+                      <topic id="ps-5" timestamp="1711804920034">
+                        <title>GET /relationship/product-symptom/{id}/evidence</title>
+                        <labels>
+                          <label>佐证数据</label>
+                          <label>新闻/投诉</label>
+                        </labels>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+                <topic id="allergen-symptom" timestamp="1711804920035">
+                  <title>化学应激源-不良反应关联</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="as-1" timestamp="1711804920036">
+                        <title>GET /relationship/allergen-symptom</title>
+                      </topic>
+                      <topic id="as-2" timestamp="1711804920037">
+                        <title>POST /relationship/allergen-symptom</title>
+                      </topic>
+                      <topic id="as-3" timestamp="1711804920038">
+                        <title>PUT /relationship/allergen-symptom/{id}</title>
+                        <labels>
+                          <label>批量文献关联</label>
+                        </labels>
+                      </topic>
+                      <topic id="as-4" timestamp="1711804920039">
+                        <title>DELETE /relationship/allergen-symptom/{id}</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+                <topic id="allergen-product" timestamp="1711804920040">
+                  <title>化学应激源-产品关联</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="ap-1" timestamp="1711804920041">
+                        <title>GET /relationship/allergen-product</title>
+                      </topic>
+                      <topic id="ap-2" timestamp="1711804920042">
+                        <title>POST /relationship/allergen-product</title>
+                      </topic>
+                      <topic id="ap-3" timestamp="1711804920043">
+                        <title>DELETE /relationship/allergen-product/{id}</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+              </topics>
+            </children>
+          </topic>
+          
+          <!-- 数据采集任务 -->
+          <topic id="collection-task" timestamp="1711804920044">
+            <title>4. 数据采集任务（新增）</title>
+            <children>
+              <topics type="attached">
+                <topic id="task-mgmt" timestamp="1711804920045">
+                  <title>采集任务管理</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="tm-1" timestamp="1711804920046">
+                        <title>POST /collection/tasks - 创建任务</title>
+                        <labels>
+                          <label>maxCountPerSource参数</label>
+                        </labels>
+                      </topic>
+                      <topic id="tm-2" timestamp="1711804920047">
+                        <title>GET /collection/tasks - 获取列表</title>
+                      </topic>
+                      <topic id="tm-3" timestamp="1711804920048">
+                        <title>任务状态流转</title>
+                        <labels>
+                          <label>pending → running → completed/failed</label>
+                        </labels>
+                      </topic>
+                    </topics>
+                  </children>
+                  <labels>
+                    <label>collection_task表</label>
+                  </labels>
+                </topic>
+                <topic id="result-mgmt" timestamp="1711804920049">
+                  <title>采集结果管理</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="rm-1" timestamp="1711804920050">
+                        <title>GET /collection/results - 获取结果</title>
+                        <labels>
+                          <label>news_filter/recall_filter</label>
+                        </labels>
+                      </topic>
+                      <topic id="rm-2" timestamp="1711804920051">
+                        <title>POST /collection/results/import - 入库</title>
+                        <labels>
+                          <label>选择实体关系</label>
+                          <label>关联product_symptom_id</label>
+                        </labels>
+                      </topic>
+                      <topic id="rm-3" timestamp="1711804920052">
+                        <title>DELETE /collection/results/{id} - 删除</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+              </topics>
+            </children>
+          </topic>
+          
+          <!-- 核心业务逻辑 -->
+          <topic id="business-logic" timestamp="1711804920053">
+            <title>5. 核心业务逻辑</title>
+            <children>
+              <topics type="attached">
+                <topic id="statistics" timestamp="1711804920054">
+                  <title>统计数量聚合</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="stat-1" timestamp="1711804920055">
+                        <title>产品：不良反应数、化学应激源数</title>
+                      </topic>
+                      <topic id="stat-2" timestamp="1711804920056">
+                        <title>化学应激源：产品数、症状数</title>
+                      </topic>
+                      <topic id="stat-3" timestamp="1711804920057">
+                        <title>不良反应：产品数、化学应激源数</title>
+                      </topic>
+                    </topics>
+                  </children>
+                  <labels>
+                    <label>LEFT JOIN聚合</label>
+                  </labels>
+                </topic>
+                <topic id="evidence-query" timestamp="1711804920058">
+                  <title>佐证数据查询</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="eq-1" timestamp="1711804920059">
+                        <title>JOIN product_symptom_news</title>
+                      </topic>
+                      <topic id="eq-2" timestamp="1711804920060">
+                        <title>JOIN product_symptom_complaints</title>
+                      </topic>
+                      <topic id="eq-3" timestamp="1711804920061">
+                        <title>返回表格格式数据</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+                <topic id="delete-check" timestamp="1711804920062">
+                  <title>删除前关联检查</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="dc-1" timestamp="1711804920063">
+                        <title>检查关联表</title>
+                      </topic>
+                      <topic id="dc-2" timestamp="1711804920064">
+                        <title>有关联返回409错误</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+                <topic id="collection-flow" timestamp="1711804920065">
+                  <title>采集任务流程</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="cf-1" timestamp="1711804920066">
+                        <title>创建任务（UUID）</title>
+                      </topic>
+                      <topic id="cf-2" timestamp="1711804920067">
+                        <title>触发爬虫服务</title>
+                      </topic>
+                      <topic id="cf-3" timestamp="1711804920068">
+                        <title>数据写入暂存表</title>
+                      </topic>
+                      <topic id="cf-4" timestamp="1711804920069">
+                        <title>入库：复制+关联</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+              </topics>
+            </children>
+          </topic>
+          
+          <!-- 数据库迁移 -->
+          <topic id="database-migration" timestamp="1711804920070">
+            <title>6. 数据库迁移</title>
+            <children>
+              <topics type="attached">
+                <topic id="new-table" timestamp="1711804920071">
+                  <title>新增表</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="nt-1" timestamp="1711804920072">
+                        <title>collection_task - 采集任务表</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+                <topic id="extend-fields" timestamp="1711804920073">
+                  <title>扩展字段</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="ef-1" timestamp="1711804920074">
+                        <title>news_filter: task_id, review_status</title>
+                      </topic>
+                      <topic id="ef-2" timestamp="1711804920075">
+                        <title>recall_filter: task_id, review_status</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+              </topics>
+            </children>
+          </topic>
+          
+          <!-- 开发优先级 -->
+          <topic id="priority" timestamp="1711804920076">
+            <title>7. 开发优先级</title>
+            <children>
+              <topics type="attached">
+                <topic id="high-priority" timestamp="1711804920077">
+                  <title>高优先级</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="hp-1" timestamp="1711804920078">
+                        <title>类别管理接口（CRUD）</title>
+                        <labels>
+                          <label>优先级1</label>
+                        </labels>
+                      </topic>
+                      <topic id="hp-2" timestamp="1711804920079">
+                        <title>佐证数据查询接口</title>
+                        <labels>
+                          <label>优先级2</label>
+                        </labels>
+                      </topic>
+                      <topic id="hp-3" timestamp="1711804920080">
+                        <title>collection_task表迁移</title>
+                        <labels>
+                          <label>优先级3</label>
+                        </labels>
+                      </topic>
+                      <topic id="hp-4" timestamp="1711804920081">
+                        <title>暂存表字段扩展</title>
+                        <labels>
+                          <label>优先级4</label>
+                        </labels>
+                      </topic>
+                      <topic id="hp-5" timestamp="1711804920082">
+                        <title>collection_task蓝图注册</title>
+                        <labels>
+                          <label>优先级5</label>
+                        </labels>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+                <topic id="medium-priority" timestamp="1711804920083">
+                  <title>中优先级</title>
+                  <children>
+                    <topics type="attached">
+                      <topic id="mp-1" timestamp="1711804920084">
+                        <title>列表接口统计扩展</title>
+                      </topic>
+                      <topic id="mp-2" timestamp="1711804920085">
+                        <title>关联信息修改接口</title>
+                      </topic>
+                      <topic id="mp-3" timestamp="1711804920086">
+                        <title>关联列表查询接口</title>
+                      </topic>
+                      <topic id="mp-4" timestamp="1711804920087">
+                        <title>症状管理完善（level3）</title>
+                      </topic>
+                    </topics>
+                  </children>
+                </topic>
+              </topics>
+            </children>
+          </topic>
+        </topics>
+      </children>
+    </topic>
+  </sheet>
+</xmap-content>
